@@ -15,10 +15,10 @@
 import io
 import random
 from drive_cse_upload import _cse_crypter
-from absl.testing import absltest
+from google3.testing.pybase import googletest
 
 
-class CseCrypterTest(absltest.TestCase):
+class CseCrypterTest(googletest.TestCase):
 
   def test_encrypt_short(self):
     # single chunk
@@ -46,4 +46,4 @@ class CseCrypterTest(absltest.TestCase):
 
 
 if __name__ == '__main__':
-  absltest.main()
+  googletest.main()

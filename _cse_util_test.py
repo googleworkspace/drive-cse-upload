@@ -14,10 +14,10 @@
 
 import random
 from drive_cse_upload import _cse_util
-from absl.testing import absltest
+from google3.testing.pybase import googletest
 
 
-class CseUtilTest(absltest.TestCase):
+class CseUtilTest(googletest.TestCase):
 
   def test_b64encode(self):
     data = b'i\x9f\xbb\xeb\xfc'
@@ -45,4 +45,4 @@ class CseUtilTest(absltest.TestCase):
 
 
 if __name__ == '__main__':
-  absltest.main()
+  googletest.main()

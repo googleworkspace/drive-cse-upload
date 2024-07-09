@@ -13,10 +13,10 @@
 # limitations under the License.
 
 from drive_cse_upload import _cse_kacls_client
-from absl.testing import absltest
+from google3.testing.pybase import googletest
 
 
-class CseKaclsClientTest(absltest.TestCase):
+class CseKaclsClientTest(googletest.TestCase):
 
   def test_resource_key_hash(self):
     client = _cse_kacls_client.CseKaclsClient()
@@ -27,4 +27,4 @@ class CseKaclsClientTest(absltest.TestCase):
 
 
 if __name__ == '__main__':
-  absltest.main()
+  googletest.main()
