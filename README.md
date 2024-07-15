@@ -1,9 +1,21 @@
 # Drive CSE Upload
 
-A Python library for uploading a file from local-host to Google Drive as a
-Client Side Encrypted (CSE) document.
+With
+[Google Workspace Client-side encryption](https://support.google.com/a/answer/10741897)
+(CSE), you can add another layer of encryption to your organization's data —
+like files and emails — in addition to the default encryption that Google
+Workspace provides.
 
-See https://support.google.com/a/answer/10741897
+For select Google Workspace editions, admins can import sensitive files from
+third-party storage using Client-side encryption and the
+[Google Drive API](https://developers.google.com/drive/api/guides/about-sdk),
+preserving the confidentiality of your data. Eligible admins can apply for beta
+access using
+[this form](http://docs/forms/d/e/1FAIpQLSfCROxYOykvmIiEx0X7rdsGqQwb4iXjc_PJVw83QGNHisgh0A/viewform).
+
+In this package we are providing a code sample (in the form of a Python library)
+to upload files hosted locally to Google Drive as Client-side encrypted (CSE)
+files.
 
 ## Project Prerequisites
 
