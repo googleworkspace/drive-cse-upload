@@ -5,28 +5,6 @@ Client Side Encrypted (CSE) document.
 
 See https://support.google.com/a/answer/10741897
 
-## Software Dependencies
-
-### Python
-
--   Python 3.10.7 or greater
-
-### Tink Cryptographic Library
-
--   https://developers.google.com/tink
-
-```shell
-pip3 install tink==1.10.0
-```
-
-### Google Client Library
-
--   https://developers.google.com/drive/api/quickstart/python
-
-```shell
-pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
-```
-
 ## Project Prerequisites
 
 ### Google Cloud
@@ -69,6 +47,43 @@ pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-
     `/privilegedunwrap` by the admin user
 -   Have the KACLS configured for the domain allow `/digest` by Google
 -   See https://developers.google.com/workspace/cse/reference
+
+## Installing this Package
+
+The easiest way to install this package is to get it from [PyPi](https://pypi.org/project/drive-cse-upload/):
+
+```shell
+pip install drive-cse-upload
+```
+
+This will get this package and all of its dependencies.
+
+<details>
+<summary>Details</summary>
+
+If you get this package from GitHub, you'll need to install its dependencies separately.
+
+##### Python
+
+-   Python 3.10.7 or greater
+
+##### Tink Cryptographic Library
+
+-   https://developers.google.com/tink
+
+```shell
+pip3 install tink>=1.10.0
+```
+
+##### Google Client Library
+
+-   https://developers.google.com/drive/api/quickstart/python
+
+```shell
+pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
+```
+
+</details>
 
 ## Running the Example
 
