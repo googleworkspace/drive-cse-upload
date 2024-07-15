@@ -1,0 +1,30 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "drive-cse-upload"
+version = "1.0.0"
+authors = [
+  { name = "Drive CSE Team", email="no-reply@google.com" },
+]
+description = "Upload a file from local-host to Google Drive as a Client Side Encrypted (CSE) document"
+license = {file = "LICENSE"}
+readme = "README.md"
+requires-python = ">=3.10.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Development Status :: 4 - Beta",
+]
+dependencies = [
+  "tink>=1.10.0",
+  "google-api-python-client",
+  "google-auth-httplib2",
+  "google-auth-oauthlib"
+]
+
+[project.urls]
+Repository = "https://github.com/googleworkspace/drive-cse-upload"
