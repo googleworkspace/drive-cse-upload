@@ -32,18 +32,34 @@ class CseCrypterTest(absltest.TestCase):
     data = random.randbytes(length)
     self._do_test_encrypt(data)
 
+  def test_encrypt_empty(self):
+    # 0 size
+    data = b''
+    self._do_test_encrypt(data)
+
+  def test_encrypt_chunk_size(self):
+    # exact positive multiple of chunk size
+    chunk_size = _cse_crypter.CseCrypter.PLAINTEXT_CHUNK_SIZE
+    length = random.randint(1, 3) * chunk_size
+    data = random.randbytes(length)
+    self._do_test_encrypt(data)
+
   def _do_test_encrypt(self, data):
     crypter = _cse_crypter.CseCrypter()
-    plaintext = io.BytesIO(data)
+    plaintext = io.BufferedReader(io.BytesIO(data))
     ciphertext = io.BytesIO()
     crypter.encrypt(plaintext, ciphertext)
     plaintext.seek(0)
     ciphertext.seek(0)
     plaintext2 = io.BytesIO()
-    crypter.decrypt(crypter.get_key(), ciphertext, plaintext2)
+    crypter.decrypt(
+        crypter.get_key(), io.BufferedReader(ciphertext), plaintext2
+    )
     plaintext2.seek(0)
     self.assertEqual(plaintext2.read(), plaintext.read())
-
+    plaintext.close()
+    ciphertext.close()
+    plaintext2.close()
 
 if __name__ == '__main__':
   absltest.main()

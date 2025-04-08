@@ -157,12 +157,14 @@ class CseUploader(object):
 
       outp = io.BytesIO()
       content.seek(0)
-      crypter.decrypt(_cse_util.b64decode(downloaded_key), content, outp)
+      inp = io.BufferedReader(content)  # pytype: disable=wrong-arg-types
+      crypter.decrypt(_cse_util.b64decode(downloaded_key), inp, outp)
       outp.seek(0)
       downloaded_plaintext_digest = hashlib.file_digest(
           outp, hashlib.sha256
       ).hexdigest()
       content.close()
+      inp.close()
       outp.close()
 
       for k in list(downloaded_decryption_metadata.keys()):

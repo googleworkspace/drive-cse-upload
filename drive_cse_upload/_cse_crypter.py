@@ -43,8 +43,8 @@ class CseCrypter(object):
     """Encrypt plaintext data.
 
     Args:
-      plaintext: Data to encrypt; a readable file-like object.
-      ciphertext: Encrypted data; a writable file-like object.
+      plaintext: Data to encrypt; a readable buffered file-like object.
+      ciphertext: Encrypted data; a writable buffered file-like object.
 
     Returns:
         None
@@ -60,7 +60,8 @@ class CseCrypter(object):
     while True:
       n = plaintext.readinto(buf)
       data = self._prefix(buf, n)
-      if n < self.PLAINTEXT_CHUNK_SIZE:
+      # pylint: disable=g-explicit-length-test
+      if n < self.PLAINTEXT_CHUNK_SIZE or len(plaintext.peek(1)) == 0:
         ciphertext.write(
             self._update(data, self.OpType.ENCRYPT, is_last_chunk=True)
         )
@@ -74,8 +75,8 @@ class CseCrypter(object):
 
     Args:
       key: Key used to encrypt the ciphertext.
-      ciphertext: Data to decrypt; a readable file-like object.
-      plaintext: Decrypted data; a writable file-like object.
+      ciphertext: Data to decrypt; a readable buffered file-like object.
+      plaintext: Decrypted data; a writable buffered file-like object.
 
     Returns:
         None
@@ -91,7 +92,8 @@ class CseCrypter(object):
     while True:
       n = ciphertext.readinto(buf)
       data = self._prefix(buf, n)
-      if n < self.CIPHERTEXT_CHUNK_SIZE:
+      # pylint: disable=g-explicit-length-test
+      if n < self.CIPHERTEXT_CHUNK_SIZE or len(ciphertext.peek(1)) == 0:
         plaintext.write(
             self._update(data, self.OpType.DECRYPT, is_last_chunk=True)
         )
