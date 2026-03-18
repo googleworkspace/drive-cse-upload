@@ -35,7 +35,7 @@ class CseDriveClient(object):
 
   GOOGLEAPIS_URL = 'https://www.googleapis.com'
 
-  DRIVE_FILES = 'drive/v3beta/files'
+  DRIVE_FILES = 'drive/v3/files'
   FILES_METADATA_URL = f'{GOOGLEAPIS_URL}/{DRIVE_FILES}'
   FILES_UPLOAD_URL = f'{GOOGLEAPIS_URL}/upload/{DRIVE_FILES}'
 
@@ -47,7 +47,7 @@ class CseDriveClient(object):
       'accept-encoding': 'gzip, deflate',
       'user-agent': '(gzip)',
   }
-  PARAMS = {'alt': 'json', 'supportsTeamDrives': 'true'}
+  PARAMS = {'alt': 'json', 'supportsAllDrives': 'true'}
 
   SCOPES = ['https://www.googleapis.com/auth/drive']
 
@@ -93,9 +93,9 @@ class CseDriveClient(object):
         creds, http=self._http
     )
 
-    params = self._new_params({'role': 'writer'})
+    params = self._new_params({})
     if parent_id:
-      params['parentId'] = parent_id
+      params['parent'] = parent_id
     url = f'{self.FILES_METADATA_URL}/generateCseToken?{urllib.parse.urlencode(params)}'
     headers = self._new_headers({})
 
