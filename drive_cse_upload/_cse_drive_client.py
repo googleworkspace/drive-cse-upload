@@ -86,12 +86,7 @@ class CseDriveClient(object):
     Returns:
         A CSE Token, as a dict.
     """
-    if not self._delegated_user_email:
-      raise ValueError('Delegated user email not set')
-    creds = self._creds.with_subject(self._delegated_user_email)
-    authorized_http = google_auth_httplib2.AuthorizedHttp(
-        creds, http=self._http
-    )
+    authorized_http = self._authorized_http()
 
     params = self._new_params({'role': 'writer'})
     if parent_id:
@@ -135,12 +130,7 @@ class CseDriveClient(object):
     Returns:
       The metadata of the newly uploaded file, as a dict.
     """
-    if not self._delegated_user_email:
-      raise ValueError('Delegated user email not set')
-    creds = self._creds.with_subject(self._delegated_user_email)
-    authorized_http = google_auth_httplib2.AuthorizedHttp(
-        creds, http=self._http
-    )
+    authorized_http = self._authorized_http()
 
     params = self._new_params({'uploadType': 'multipart'})
     url = f'{self.FILES_UPLOAD_URL}?{urllib.parse.urlencode(params)}'
@@ -185,10 +175,8 @@ class CseDriveClient(object):
       The metadata of the downloaded file, as a dict, and the file's content,
       as a BytesIO object. The caller must close() the object.
     """
-    creds = self._creds.with_subject(self._delegated_user_email)
-    authorized_http = google_auth_httplib2.AuthorizedHttp(
-        creds, http=self._http
-    )
+    authorized_http = self._authorized_http()
+
     fields = [
         'id',
         'name',
@@ -244,10 +232,8 @@ class CseDriveClient(object):
     Returns:
       Empty dict.
     """
-    creds = self._creds.with_subject(self._delegated_user_email)
-    authorized_http = google_auth_httplib2.AuthorizedHttp(
-        creds, http=self._http
-    )
+    authorized_http = self._authorized_http()
+
     params = self._new_params({})
     url = (
         f'{self.FILES_METADATA_URL}/{file_id}?{urllib.parse.urlencode(params)}'
@@ -310,6 +296,15 @@ class CseDriveClient(object):
     headers = self.HEADERS.copy()
     headers.update(more_headers)
     return headers
+
+  def _authorized_http(self):
+    if not self._delegated_user_email:
+      raise ValueError('Delegated user email not set')
+    creds = self._creds.with_subject(self._delegated_user_email)
+    authorized_http = google_auth_httplib2.AuthorizedHttp(
+        creds, http=self._http
+    )
+    return authorized_http
 
   def _get_cse_mime_type(self, content_type=None):
     if not content_type:
