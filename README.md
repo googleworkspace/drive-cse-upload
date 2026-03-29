@@ -9,13 +9,16 @@ Workspace provides.
 For select Google Workspace editions, admins can import sensitive files from
 third-party storage using Client-side encryption and the
 [Google Drive API](https://developers.google.com/drive/api/guides/about-sdk),
-preserving the confidentiality of your data. Eligible admins can apply for beta
-access using
-[this form](http://docs/forms/d/e/1FAIpQLSfCROxYOykvmIiEx0X7rdsGqQwb4iXjc_PJVw83QGNHisgh0A/viewform).
+preserving the confidentiality of your data.
 
 In this package we are providing a code sample (in the form of a Python library)
 to upload files hosted locally to Google Drive as Client-side encrypted (CSE)
 files.
+
+## Disclaimer
+
+This sample is provided only to show how the basic logic can be implemented.
+It’s not meant to be a production-grade working solution.
 
 ## Project Prerequisites
 
