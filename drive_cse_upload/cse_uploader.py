@@ -94,7 +94,7 @@ class CseUploader(object):
 
     driver.set_delegated_user(delegated_user_email)
 
-    cse_token = driver.generate_cse_token(parent_id)
+    cse_token = driver.generate_cse_token(parent_id=parent_id)
     jwt = cse_token['jwt']
     file_id = cse_token['fileId']
     kacls_id = cse_token['currentKaclsId']
