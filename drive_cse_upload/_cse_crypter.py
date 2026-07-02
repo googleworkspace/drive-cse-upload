@@ -35,7 +35,7 @@ class CseCrypter(object):
 
   def __init__(self):
     self._key = None
-    self._aead: aead.Aead = None
+    self._aead: aead.Aead = None  # pyrefly: ignore[bad-assignment]
     self._current_chunk_count = 0
     aead.register()
 
@@ -123,7 +123,7 @@ class CseCrypter(object):
       case self.OpType.DECRYPT:
         chunk = self._aead.decrypt(data, associated_data)
     self._current_chunk_count += 1
-    return chunk
+    return chunk  # pyrefly: ignore[unbound-name]
 
   def _get_key_from_handle(self, keyset_handle):
     keyset = keyset_handle._keyset  # pylint: disable=protected-access

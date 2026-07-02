@@ -45,7 +45,7 @@ class CseIdpClient(object):
     """
     self._client_secret_file = client_secret_file
     self._saved_creds_file = saved_creds_file
-    self._creds: credentials.Credentials = None
+    self._creds: credentials.Credentials = None  # pyrefly: ignore[bad-assignment]
     self._lock = threading.Lock()
 
   def get_authn_token(self):

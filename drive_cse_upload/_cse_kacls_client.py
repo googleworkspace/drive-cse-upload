@@ -56,7 +56,7 @@ class CseKaclsClient(object):
         'reason': 'import',
     }
     r = requests.post(wrap_url, json=request)
-    if r.status_code != requests.codes.ok:
+    if r.status_code != requests.codes.ok:  # pyrefly: ignore[missing-attribute]
       raise RuntimeError('Wrap failed: ' + r.text)
     response = r.json()
     return response['wrapped_key']
@@ -84,7 +84,7 @@ class CseKaclsClient(object):
         'reason': 'import',
     }
     r = requests.post(unwrap_url, json=request)
-    if r.status_code != requests.codes.ok:
+    if r.status_code != requests.codes.ok:  # pyrefly: ignore[missing-attribute]
       raise RuntimeError('Unwrap failed: ' + r.text)
     response = r.json()
     return response['key']
