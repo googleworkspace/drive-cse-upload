@@ -113,7 +113,7 @@ class CseUploader(object):
         inp.seek(0)
         input_plaintext_digest = hashlib.file_digest(
             inp, hashlib.sha256
-        ).hexdigest()  # pytype: disable=wrong-arg-types
+        ).hexdigest()
     key = crypter.get_key()
     wdek = kacls.privileged_wrap(
         _cse_util.b64encode(key), resource_name, authn, kacls_url, perimeter_id
@@ -157,7 +157,7 @@ class CseUploader(object):
 
       outp = io.BytesIO()
       content.seek(0)
-      inp = io.BufferedReader(content)  # pytype: disable=wrong-arg-types
+      inp = io.BufferedReader(content)
       crypter.decrypt(_cse_util.b64decode(downloaded_key), inp, outp)
       outp.seek(0)
       downloaded_plaintext_digest = hashlib.file_digest(
