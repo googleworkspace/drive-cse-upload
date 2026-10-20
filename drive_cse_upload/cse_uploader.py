@@ -93,7 +93,9 @@ class CseUploader(object):
     driver = _cse_drive_client.CseDriveClient(self._sa_key_file)
 
     content_type = mimetypes.guess_type(input_file)[0]
-    filename = pathlib.Path(input_file).name
+    path = pathlib.Path(input_file)
+    filename = path.name
+    filesize = path.stat().st_size
 
     driver.set_delegated_user(delegated_user_email)
 
@@ -136,7 +138,13 @@ class CseUploader(object):
 
     LOGGER.debug('Uploading encrypted file to Drive ...')
     file = driver.cse_upload(
-        outp, file_id, filename, encryption_details, parent_id, content_type
+        outp,
+        file_id,
+        filename,
+        encryption_details,
+        parent_id,
+        content_type,
+        size_hint=filesize,
     )
     outp.close()
 

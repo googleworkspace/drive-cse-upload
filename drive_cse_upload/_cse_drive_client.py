@@ -15,12 +15,12 @@
 """Drive CSE API."""
 
 import io
+from drive_cse_upload._cse_logger import LOGGER
 import google
 import google.oauth2.service_account
 import google_auth_httplib2
 from googleapiclient import discovery
 from googleapiclient import http
-import httplib2
 
 
 class CseDriveClient(object):
@@ -28,6 +28,8 @@ class CseDriveClient(object):
 
   ENCRYPTED_MIME_TYPE_PREFIX = 'application/vnd.google-gsuite.encrypted'
   OCTET_STREAM = 'application/octet-stream'
+  CHUNK_SIZE = 8 * 1024 * 1024
+  NUM_RETRIES = 3
 
   SCOPES = ['https://www.googleapis.com/auth/drive']
 
@@ -42,7 +44,7 @@ class CseDriveClient(object):
             sa_key_file, scopes=self.SCOPES
         )
     )
-    self._http = httplib2.Http()
+    self._http = http.build_http()
     self._delegated_user_email = None
 
   def set_delegated_user(self, delegated_user_email):
@@ -89,6 +91,7 @@ class CseDriveClient(object):
       encryption_details,
       parent_id,
       content_type,
+      size_hint=0,
   ):
     """Upload the given data as a new CSE file.
 
@@ -100,6 +103,7 @@ class CseDriveClient(object):
       parent_id: The parent of the file being uploaded. If None, use the root
         MyDrive of `delegated_user_email`.
       content_type: The content-type of the file being uploaded.
+      size_hint: the size of the uploaded file, if available.
 
     Returns:
       The metadata of the newly uploaded file, as a dict.
@@ -113,12 +117,25 @@ class CseDriveClient(object):
     }
     if parent_id:
       file_metadata['parents'] = [parent_id]
-    media = http.MediaIoBaseUpload(fd=data_fp, mimetype=self.OCTET_STREAM)
+    resumable = size_hint > 2 * self.CHUNK_SIZE
+    media = http.MediaIoBaseUpload(
+        fd=data_fp,
+        mimetype=self.OCTET_STREAM,
+        resumable=resumable,
+        chunksize=self.CHUNK_SIZE,
+    )
     with self._service() as service:
       request = service.files().create(
           body=file_metadata, media_body=media, supportsAllDrives=True
       )
-      response = request.execute()
+      response = None
+      if resumable:
+        while response is None:
+          status, response = request.next_chunk(num_retries=self.NUM_RETRIES)
+          if status:
+            LOGGER.debug('Uploaded %s%% ...', int(status.progress() * 100))
+      else:
+        response = request.execute()
       return response
 
   def cse_update(
@@ -128,6 +145,7 @@ class CseDriveClient(object):
       filename,
       encryption_details,
       content_type,
+      size_hint=0,
   ):
     """Upload the given data as a new revision of an existing CSE file.
 
@@ -137,6 +155,7 @@ class CseDriveClient(object):
       filename: The name of the file being updated.
       encryption_details: Encryption metadata for the file being updated.
       content_type: The content-type of the file being updated.
+      size_hint: the size of the uploaded file, if available.
 
     Returns:
       The metadata of the newly updated file, as a dict.
@@ -147,7 +166,13 @@ class CseDriveClient(object):
         'mimeType': self._get_cse_mime_type(content_type),
         'clientEncryptionDetails': encryption_details,
     }
-    media = http.MediaIoBaseUpload(fd=data_fp, mimetype=self.OCTET_STREAM)
+    resumable = size_hint > 2 * self.CHUNK_SIZE
+    media = http.MediaIoBaseUpload(
+        fd=data_fp,
+        mimetype=self.OCTET_STREAM,
+        resumable=resumable,
+        chunksize=self.CHUNK_SIZE,
+    )
     with self._service() as service:
       request = service.files().update(
           fileId=file_id,
@@ -155,7 +180,14 @@ class CseDriveClient(object):
           media_body=media,
           supportsAllDrives=True,
       )
-      response = request.execute()
+      response = None
+      if resumable:
+        while response is None:
+          status, response = request.next_chunk(num_retries=self.NUM_RETRIES)
+          if status:
+            LOGGER.debug('Uploaded %s%% ...', int(status.progress() * 100))
+      else:
+        response = request.execute()
       return response
 
   def cse_download(self, file_id):
