@@ -17,6 +17,7 @@
 import argparse
 import pathlib
 import sys
+from drive_cse_upload import _cse_logger
 from drive_cse_upload import cse_uploader
 
 
@@ -60,8 +61,17 @@ def main():
       default=True,
       help='validate the upload [True]',
   )
+  parser.add_argument(
+      '--log',
+      dest='loglevel',
+      choices=['none', 'debug', 'info', 'warning', 'error', 'critical'],
+      default='info',
+      help='set package log level [info]',
+  )
   parser.add_argument('input_file', metavar='input-file', help='file to upload')
   args = parser.parse_args()
+
+  _cse_logger.config(args.loglevel)
 
   uploader = cse_uploader.CseUploader(
       args.sa_key_file,

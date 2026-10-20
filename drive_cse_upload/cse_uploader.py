@@ -25,6 +25,7 @@ from drive_cse_upload import _cse_drive_client
 from drive_cse_upload import _cse_idp_client
 from drive_cse_upload import _cse_kacls_client
 from drive_cse_upload import _cse_util
+from drive_cse_upload._cse_logger import LOGGER
 
 
 class CseUploader(object):
@@ -85,6 +86,8 @@ class CseUploader(object):
       RuntimeError: The uploaded file validation failed.
     """
 
+    LOGGER.debug('Starting to upload %s ...', input_file)
+
     crypter = _cse_crypter.CseCrypter()
     kacls = _cse_kacls_client.CseKaclsClient()
     driver = _cse_drive_client.CseDriveClient(self._sa_key_file)
@@ -94,6 +97,7 @@ class CseUploader(object):
 
     driver.set_delegated_user(delegated_user_email)
 
+    LOGGER.debug('Getting CSE authorization token from Drive ...')
     cse_token = driver.generate_cse_token(parent_id=parent_id)
     jwt = cse_token['jwt']
     file_id = cse_token['fileId']
@@ -103,8 +107,10 @@ class CseUploader(object):
     kacls_url = jwt_payload['kacls_url']
     perimeter_id = jwt_payload.get('perimeter_id', '')
 
+    LOGGER.debug('Getting authentication token from IDP ...')
     authn = self._idp.get_authn_token()
 
+    LOGGER.debug('Encrypting file ...')
     outp = io.BytesIO()
     input_plaintext_digest = None
     with open(input_file, 'rb') as inp:
@@ -115,6 +121,7 @@ class CseUploader(object):
             inp, hashlib.sha256
         ).hexdigest()
     key = crypter.get_key()
+    LOGGER.debug('Wrapping data encryption key by KACLS ...')
     wdek = kacls.privileged_wrap(
         _cse_util.b64encode(key), resource_name, authn, kacls_url, perimeter_id
     )
@@ -127,12 +134,14 @@ class CseUploader(object):
     )
     decryption_metadata = encryption_details['decryptionMetadata']
 
+    LOGGER.debug('Uploading encrypted file to Drive ...')
     file = driver.cse_upload(
         outp, file_id, filename, encryption_details, parent_id, content_type
     )
     outp.close()
 
     if self._validate:
+      LOGGER.debug('Validating uploaded file ...')
       drive_id = file['id']
       metadata, content = driver.cse_download(drive_id)
 
@@ -148,6 +157,7 @@ class CseUploader(object):
       downloaded_resource_name = downloaded_jwt_payload['resource_name']
       downloaded_kacls_url = downloaded_jwt_payload['kacls_url']
       authn = self._idp.get_authn_token()
+      LOGGER.debug('Unwrapping data encryption key by KACLS ...')
       downloaded_key = kacls.privileged_unwrap(
           downloaded_wdek,
           downloaded_resource_name,
