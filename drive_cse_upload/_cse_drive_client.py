@@ -240,7 +240,9 @@ class CseDriveClient(object):
     authorized_http = google_auth_httplib2.AuthorizedHttp(
         creds, http=self._http
     )
-    service = discovery.build('drive', 'v3', http=authorized_http)
+    service = discovery.build(
+        'drive', 'v3', http=authorized_http, cache_discovery=False
+    )
     return service
 
   def _get_cse_mime_type(self, content_type=None):
